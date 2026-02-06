@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16
+    container_name: hotel-system-db
+    environment:
+      POSTGRES_DB: hotel_management
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    image: maven:3.9.9-eclipse-temurin-21
+    container_name: hotel-system-api-dev
+    working_dir: /app
+    command: ./mvnw spring-boot:run
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/hotel_management
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+    ports:
+      - "8081:8081"
+    volumes:
+      - .:/app
+      - maven_repo:/root/.m2
+      - uploads:/app/uploads
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+  maven_repo:
+  uploads:
