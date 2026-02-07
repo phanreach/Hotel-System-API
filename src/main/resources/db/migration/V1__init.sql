@@ -51,3 +51,10 @@ CREATE TABLE IF NOT EXISTS room_amenities (
     amenity_id BIGINT NOT NULL REFERENCES amenities(id) ON DELETE CASCADE,
     PRIMARY KEY (room_id, amenity_id)
 );
+-- CREATE TABLE IF NOT EXISTS amenities (
+--     id BIGSERIAL PRIMARY KEY,
+--     name VARCHAR(255) NOT NULL UNIQUE,
+--     icon VARCHAR(255)
+-- );
+
+
