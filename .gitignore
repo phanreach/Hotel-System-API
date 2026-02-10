@@ -37,3 +37,13 @@ build/
 
 ### VS Code ###
 .vscode/
+# Ignore uploaded room images
+/uploads/
+/uploads/rooms/
+
+# Ignore all images
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp

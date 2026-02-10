@@ -1,8 +1,10 @@
 package com.example.hotel_system.repository;
 
 import com.example.hotel_system.model.Booking;
+import com.example.hotel_system.model.RoomModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import com.example.hotel_system.model.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,9 +16,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> id(Long id);
 
-    List<Booking> findByStartDate(LocalDate startDate);
+//    List<Booking> findByStartDate(LocalDate startDate);
+//
+//    List<Booking> findByEndDate(LocalDate endDate);
 
-    List<Booking> findByEndDate(LocalDate endDate);
+//    List<Booking> findByStartDateBetween(LocalDate start, LocalDate end);
 
-    List<Booking> findByStartDateBetween(LocalDate start, LocalDate end);
+    boolean existsByRoomAndCheckOutDateAfterAndCheckInDateBefore(
+            RoomModel room,
+            LocalDate checkIn,
+            LocalDate checkOut
+    );
+    List<Booking> findByBooker(User booker);
+
+    List<Booking> findByGuestEmailAndBookerIsNull(String email);
 }

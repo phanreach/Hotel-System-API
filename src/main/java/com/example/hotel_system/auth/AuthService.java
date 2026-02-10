@@ -2,12 +2,15 @@ package com.example.hotel_system.auth;
 
 import com.example.hotel_system.auth.dto.*;
 import com.example.hotel_system.exception.EmailAlreadyExistsException;
+import com.example.hotel_system.model.Booking;
 import com.example.hotel_system.model.User;
+import com.example.hotel_system.repository.BookingRepository;
 import com.example.hotel_system.security.JwtService;
 import com.example.hotel_system.auth.dto.UserDto;
 import com.example.hotel_system.user.UserRepository;
 import com.example.hotel_system.config.JwtProperties;
 import com.example.hotel_system.enumeration.EnumRole;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +27,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final BookingRepository bookingRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtProperties jwtProperties;
 
@@ -41,6 +45,8 @@ public class AuthService {
         user.setRole(EnumRole.USER);
 
         userRepository.save(user);
+        // 🔥 AUTO-LINK guest bookings after register
+        linkGuestBookings(user);
 
         return generateAuthResponse(user);
     }
@@ -54,6 +60,8 @@ public class AuthService {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        // 🔥 AUTO-LINK guest bookings after login
+        linkGuestBookings(user);
 
         return generateAuthResponse(user);
     }
@@ -103,4 +111,25 @@ public class AuthService {
                 user.getRole().name()
         );
     }
+    /* ================= LINK GUEST BOOKINGS ================= */
+
+    @Transactional
+    public void linkGuestBookings(User user){
+
+    String email = user.getEmail().trim().toLowerCase();
+
+        var bookings = bookingRepository
+                .findByGuestEmailAndBookerIsNull(email);
+
+        System.out.println("FOUND BOOKINGS = " + bookings.size());
+
+        for (Booking booking : bookings) {
+            booking.setBooker(user);
+        }
+
+        bookingRepository.flush(); // 🚀 FORCE SQL UPDATE
+    }
+
+
+
 }

@@ -30,6 +30,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @OneToMany(mappedBy = "booker")
+    private List<Booking> bookings;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EnumRole role = EnumRole.USER;

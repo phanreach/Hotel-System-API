@@ -2,10 +2,14 @@ package com.example.hotel_system.controller;
 
 import com.example.hotel_system.model.Booking;
 import com.example.hotel_system.request.BookingRequest;
+import com.example.hotel_system.request.BookingRequestDTO;
+import com.example.hotel_system.response.BookingResponseDTO;
 import com.example.hotel_system.service.BookingService;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +27,7 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<Booking> getAllBookings(){
+    public List<BookingResponseDTO> getAllBookings(){
         return bookingService.getAllBookings();
     }
 
@@ -31,25 +35,31 @@ public class BookingController {
     public List<Booking> getBookingsByStatus(@PathVariable String status) {
         return bookingService.getBookingByStatus(status);
     }
-
-    @GetMapping("/date/start/{date}")
-    public List<Booking> getBookingsByStartDate(
-            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return bookingService.getBookingsByStartDate(date);
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public List<BookingResponseDTO> myBookings() {
+        return bookingService.getMyBookings();
     }
 
-    @GetMapping("/date/end/{date}")
-    public List<Booking> getBookingsByEndDate(
-            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return bookingService.getBookingsByEndDate(date);
-    }
 
-    @GetMapping("/date/range")
-    public List<Booking> getBookingsByDateRange(
-            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
-        return bookingService.getBookingsByDateRange(start, end);
-    }
+//    @GetMapping("/date/start/{date}")
+//    public List<Booking> getBookingsByStartDate(
+//            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+//        return bookingService   .getBookingsByStartDate(date);
+//    }
+//
+//    @GetMapping("/date/end/{date}")
+//    public List<Booking> getBookingsByEndDate(
+//            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+//        return bookingService.getBookingsByEndDate(date);
+//    }
+
+//    @GetMapping("/date/range")
+//    public List<Booking> getBookingsByDateRange(
+//            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+//            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+//        return bookingService.getBookingsByDateRange(start, end);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Booking> getBookingById(@PathVariable Long id) {
@@ -60,11 +70,17 @@ public class BookingController {
         return ResponseEntity.ok(booking);
     }
 
-    @PostMapping
-    public ResponseEntity<Booking> createBooking(@Validated @RequestBody BookingRequest request){
-        Booking savedBooking = bookingService.createBooking(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedBooking);
-    }
+//    @PostMapping
+//    public ResponseEntity<Booking> createBooking(@Validated @RequestBody BookingRequest request){
+//        Booking savedBooking = bookingService.createBooking(request);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(savedBooking);
+//    }
+@PostMapping
+public ResponseEntity<BookingResponseDTO> createBooking(
+        @Valid @RequestBody BookingRequestDTO request) {
+
+    return ResponseEntity.ok(bookingService.createBooking(request));
+}
 
 
 }
