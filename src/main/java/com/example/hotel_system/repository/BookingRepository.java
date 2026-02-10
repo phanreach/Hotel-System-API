@@ -4,6 +4,7 @@ import com.example.hotel_system.model.Booking;
 import com.example.hotel_system.model.RoomModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import com.example.hotel_system.model.User;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,4 +27,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             LocalDate checkIn,
             LocalDate checkOut
     );
+    List<Booking> findByBooker(User booker);
+
+    List<Booking> findByGuestEmailAndBookerIsNull(String email);
 }

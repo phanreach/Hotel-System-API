@@ -24,7 +24,5 @@ public class RoomResponse {
     private String bedType;
     private Double rating;
     private Integer maxGuest;
-
-    List<String> images;
-
+    private List<String> images;
 }

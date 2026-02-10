@@ -164,10 +164,9 @@ public class RoomService {
         response.setImages(
                 room.getImages()
                         .stream()
-                        .map(img -> baseUrl + img)
+                        .map(img -> baseUrl + img.getImageUrl())
                         .toList()
         );
-
         return response;
     }
 

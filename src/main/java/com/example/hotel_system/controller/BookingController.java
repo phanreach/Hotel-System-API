@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,12 @@ public class BookingController {
     public List<Booking> getBookingsByStatus(@PathVariable String status) {
         return bookingService.getBookingByStatus(status);
     }
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public List<BookingResponseDTO> myBookings() {
+        return bookingService.getMyBookings();
+    }
+
 
 //    @GetMapping("/date/start/{date}")
 //    public List<Booking> getBookingsByStartDate(

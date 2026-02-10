@@ -14,6 +14,9 @@ import com.example.hotel_system.response.BookingResponseDTO;
 import com.example.hotel_system.response.GuestResponseDTO;
 import com.example.hotel_system.response.RoomResponse;
 import com.example.hotel_system.user.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -35,6 +38,8 @@ public class BookingService {
         this.userRepository = userRepository;
         this.guestRepository = guestRepository;
     }
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     public List<BookingResponseDTO> getAllBookings() {
         return bookingRepository.findAll()
@@ -72,10 +77,17 @@ public class BookingService {
 
         // 2️⃣ Load optional user
         User booker = null;
-        if (request.getUserId() != null) {
-            booker = userRepository.findById(request.getUserId())
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+
+            String email = auth.getName();
+
+            booker = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
         }
+
 
         // 3️⃣ Load room
         RoomModel room = roomRepository.findById(request.getRoomId())
@@ -89,9 +101,9 @@ public class BookingService {
                         request.getCheckOutDate()
                 );
 
-        if (isAvailable) {
-            throw new RuntimeException("Room not available for selected dates");
-        }
+//        if (isAvailable) {
+//            throw new RuntimeException("Room not available for selected dates");
+//        }
 
         // 5️⃣ Save guest
         Guest guest = new Guest();
@@ -125,7 +137,25 @@ public class BookingService {
         // 8️⃣ Build response
         return mapToResponse(booking);
     }
+    public List<BookingResponseDTO> getMyBookings() {
+
+        Authentication auth = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+
+        String email = auth.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return bookingRepository.findByBooker(user)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     private BookingResponseDTO mapToResponse(Booking booking) {
+
 
         BookingResponseDTO dto = new BookingResponseDTO();
         dto.setBookingId(booking.getId());
@@ -141,7 +171,17 @@ public class BookingService {
         RoomResponse roomResponse = new RoomResponse();
         roomResponse.setId(booking.getRoom().getId());
         roomResponse.setTitle(booking.getRoom().getTitle());
-        roomResponse.setImages(booking.getRoom().getImages());
+        roomResponse.setImages(
+                booking.getRoom()
+                        .getImages()
+                        .stream()
+                        .map(img -> baseUrl + img.getImageUrl())
+                        .toList()
+        );
+        roomResponse.setRoomType(booking.getRoom().getRoomType());
+        roomResponse.setBedType(booking.getRoom().getBedType());
+        dto.setRoomResponse(roomResponse);
+
 //        roomResponse
 
 
@@ -154,6 +194,7 @@ public class BookingService {
         guestDTO.setPhone(booking.getGuest().getPhone());
 
         dto.setGuest(guestDTO);
+
 
         return dto;
     }
