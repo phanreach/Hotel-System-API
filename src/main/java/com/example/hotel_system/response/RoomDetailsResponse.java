@@ -17,5 +17,8 @@ public class RoomDetailsResponse {
     private String description;
     private Set<AmentiesResponse> amenities = new HashSet<>(); // <-- Use DTO here
     private double pricePerNight;
+
+    private Integer guests;
     private List<String> images;
+
 }

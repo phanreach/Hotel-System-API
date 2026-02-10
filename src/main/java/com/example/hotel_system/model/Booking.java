@@ -1,32 +1,54 @@
 package com.example.hotel_system.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.example.hotel_system.enumeration.BookingStatus;
+import com.example.hotel_system.model.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-@Setter
-@Getter
+
 @Entity
-@Table(name="bookings")
+@Table(name = "bookings")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Booking {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String customerName;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private Integer nights;
-    private Double taxes;
-    private Double discount;
-    private Integer guests;
-    private String address;
-    private String status;
 
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="room_id")
+    // Booker (can be null for guest booking)
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = true)
+    private User booker;
+
+    // Guest (always required)
+    @ManyToOne
+    @JoinColumn(name = "guest_id", nullable = false)
+    private Guest guest;
+
+    // Room
+    @ManyToOne
+    @JoinColumn(name = "room_id", nullable = false)
     private RoomModel room;
 
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
+
+    private Double totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
+    private Long nights;
+
+
+    // Payment
+//    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+//    private Payment payment;
 }
+

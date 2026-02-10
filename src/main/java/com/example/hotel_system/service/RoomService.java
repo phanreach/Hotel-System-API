@@ -164,7 +164,7 @@ public class RoomService {
         response.setImages(
                 room.getImages()
                         .stream()
-                        .map(img -> baseUrl + img.getImageUrl())
+                        .map(img -> baseUrl + img)
                         .toList()
         );
 
@@ -181,9 +181,10 @@ public class RoomService {
                         .map(this::mapAmenity)
                         .collect(Collectors.toSet()),
                 room.getPricePerNight(),
+                room.getMaxGuest(),
                 room.getImages()
                         .stream()
-                        .map(img -> baseUrl + img.getImageUrl())
+                        .map(img -> baseUrl + img)
                         .toList()
         );
     }

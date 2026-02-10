@@ -41,5 +41,6 @@ public class RoomModel {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RoomImage> images = new ArrayList<>();
+    private List<String> images = new ArrayList<>();
+
 }
