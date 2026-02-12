@@ -109,8 +109,14 @@ public class RoomService {
         return roomRepository.save(room);
     }
 
+    @Transactional
     public void deleteRoom(Long id) {
-        roomRepository.deleteById(id);
+        RoomModel room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        room.getImages().forEach(img -> storageService.delete(img.getImageUrl()));
+
+        roomRepository.delete(room);
     }
 
     @Transactional
@@ -140,6 +146,49 @@ public class RoomService {
 
         return roomImageRepository.saveAll(images);
     }
+
+    @Transactional
+    public List<RoomImage> updateRoomImages(Long roomId, List<MultipartFile> files) {
+
+        RoomModel room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        if (files == null || files.isEmpty()) {
+            throw new RuntimeException("No files provided");
+        }
+
+        // ✅ 1. Delete old images (DB + storage)
+        List<RoomImage> oldImages = roomImageRepository.findByRoom(room);
+        oldImages.forEach(img -> storageService.delete(img.getImageUrl()));
+        roomImageRepository.deleteAll(oldImages);
+
+
+        // ✅ 2. Save new images
+        List<RoomImage> newImages = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) {
+                throw new RuntimeException("Empty file is not allowed");
+            }
+
+            // ✅ validate content type
+            if (!file.getContentType().startsWith("image/")) {
+                throw new RuntimeException("Only image files are allowed");
+            }
+
+            String relativePath = storageService.save(file);
+
+            RoomImage image = new RoomImage();
+            image.setImageUrl(relativePath);
+            image.setImageType(file.getContentType());
+            image.setRoom(room);
+
+            newImages.add(image);
+        }
+
+        return roomImageRepository.saveAll(newImages);
+    }
+
 
     private RoomResponse mapToResponse(RoomModel room) {
         RoomResponse response = new RoomResponse();
@@ -183,7 +232,7 @@ public class RoomService {
                 room.getMaxGuest(),
                 room.getImages()
                         .stream()
-                        .map(img -> baseUrl + img)
+                        .map(img -> baseUrl + img.getImageUrl())
                         .toList()
         );
     }
@@ -195,4 +244,28 @@ public class RoomService {
         res.setIcon(baseUrl + amenity.getIcon());
         return res;
     }
+
+    @Transactional
+    public List<RoomImage> syncRoomImages(Long roomId, List<String> keepImages) {
+        RoomModel room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        if (keepImages == null) keepImages = List.of();
+
+        List<String> relativePaths = keepImages.stream()
+                .map(url -> url.replace(baseUrl, ""))
+                .toList();
+
+        List<RoomImage> toDelete = roomImageRepository.findByRoom(room)
+                .stream()
+                .filter(img -> !relativePaths.contains(img.getImageUrl()))
+                .toList();
+
+        toDelete.forEach(img -> storageService.delete(img.getImageUrl()));
+
+        roomImageRepository.deleteAll(toDelete);
+
+        return roomImageRepository.findByRoom(room);
+    }
+
 }

@@ -78,11 +78,35 @@ public class RoomController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<RoomImage>> uploadImages(
             @PathVariable Long roomId,
-            @RequestParam("images") MultipartFile[] files // accept array
+            @RequestParam("images") MultipartFile[] files
     ) {
         return ResponseEntity.ok(
                 roomService.uploadRoomImages(roomId, Arrays.asList(files))
         );
+    }
+
+    @PutMapping(
+            value = "/{roomId}/update-images",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<RoomImage>> updateRoomImages(
+            @PathVariable Long roomId,
+            @RequestParam("images") MultipartFile[] files
+    ) {
+        return ResponseEntity.ok(
+                roomService.updateRoomImages(roomId, Arrays.asList(files))
+        );
+    }
+
+    @PutMapping("/{roomId}/sync-images")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> syncRoomImages(
+            @PathVariable("roomId") Long roomId,
+            @RequestBody List<String> keepImages
+    ) {
+        roomService.syncRoomImages(roomId, keepImages);
+        return ResponseEntity.ok().build();
     }
 
 }

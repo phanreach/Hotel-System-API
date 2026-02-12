@@ -14,9 +14,12 @@ public class RoomRequest {
     private String description;
     private double pricePerNight;
     private String roomType;
-    private Set<Long> amenityIds;
+    private List<Long> amenityIds;
     private String bedType;
     private Integer bedSize;
     private Float rating;
     private Integer maxGuest;
 }
+
+
+

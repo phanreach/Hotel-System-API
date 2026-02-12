@@ -85,7 +85,9 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://hotel-wing-project.mrrorng12345.workers.dev"
+                "https://hotel-wing-project.mrrorng12345.workers.dev",
+                "https://hotel-admin.mockexamkh.com",
+                "https://hotel-management.reach4phan.workers.dev"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

@@ -23,12 +23,37 @@ public class FileStorageService {
             Files.createDirectories(uploadPath);
 
             Path filePath = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(
+                    file.getInputStream(),
+                    filePath,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
 
+            // stored as relative path (IMPORTANT)
             return "/uploads/rooms/" + fileName;
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file", e);
+        }
+    }
+
+    // ✅ ADD THIS METHOD
+    public void delete(String relativePath) {
+        try {
+            if (relativePath == null || relativePath.isBlank()) return;
+
+            // remove leading "/"
+            String cleanPath = relativePath.startsWith("/")
+                    ? relativePath.substring(1)
+                    : relativePath;
+
+            Path filePath = Paths.get(cleanPath);
+
+            Files.deleteIfExists(filePath);
+
+        } catch (IOException e) {
+            // log only, never crash transaction
+            System.err.println("Failed to delete file: " + relativePath);
         }
     }
 }
