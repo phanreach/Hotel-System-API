@@ -1,6 +1,5 @@
 package com.example.hotel_system.request;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
@@ -13,9 +12,6 @@ import java.time.LocalDate;
 @Data
 public class BookingRequestDTO {
 
-    // Optional (null = guest booking)
-    private Long userId;
-
     @NotNull(message = "Room id is required")
     private Long roomId;
 
@@ -26,10 +22,8 @@ public class BookingRequestDTO {
     @NotNull(message = "Check-out date is required")
     @Future(message = "Check-out date must be after today")
     private LocalDate checkOutDate;
+    private String phone;
+    private String specialRequest;
 
-    private Long nights;
-
-    @Valid
-    @NotNull(message = "Guest information is required")
-    private GuestRequestDTO guest;
+    private Long nights; // Optional, can be calculated in service
 }

@@ -1,5 +1,6 @@
 package com.example.hotel_system.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import com.example.hotel_system.enumeration.EnumRole;
@@ -30,7 +31,11 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String phone;
+
     @OneToMany(mappedBy = "booker")
+    @JsonIgnore
     private List<Booking> bookings;
 
     @Enumerated(EnumType.STRING)

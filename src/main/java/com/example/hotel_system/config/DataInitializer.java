@@ -24,6 +24,7 @@ public class DataInitializer {
                 admin.setFirstName("System");
                 admin.setLastName("Admin");
                 admin.setPassword(passwordEncoder.encode("admin123"));
+                admin.setPhone("010203040");
                 admin.setRole(EnumRole.ADMIN);
                 userRepository.save(admin);
             }

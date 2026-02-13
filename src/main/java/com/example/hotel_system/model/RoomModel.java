@@ -1,5 +1,6 @@
 package com.example.hotel_system.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,8 +32,8 @@ public class RoomModel {
     private Float rating;
     private Integer maxGuest;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Booking> bookings;
 
     @ManyToMany(fetch = FetchType.LAZY)

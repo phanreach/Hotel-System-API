@@ -12,17 +12,19 @@ import java.time.LocalDate;
 public class BookingResponseDTO {
 
     private Long bookingId;
-
-    private String bookerName; // null if guest booking
-    private RoomResponse roomResponse;
+    private Double totalPrice;
+    private Long nights;
 
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
 
-    private Double totalPrice;
-    private String status;
+    private String bookerName;
+    private String bookerEmail;
+    private String bookerPhone;
+    private String specialRequest;
 
-    private GuestResponseDTO guest;
-    private Long nights;
+    private RoomResponse roomResponse;
 }
+
+
 

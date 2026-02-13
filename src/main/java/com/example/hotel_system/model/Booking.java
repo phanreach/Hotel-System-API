@@ -1,7 +1,6 @@
 package com.example.hotel_system.model;
 
-import com.example.hotel_system.enumeration.BookingStatus;
-import com.example.hotel_system.model.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,15 +21,11 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Booker (can be null for guest booking)
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
+    // Logged-in user who booked
+    @JsonBackReference
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User booker;
-
-    // Guest (always required)
-    @ManyToOne
-    @JoinColumn(name = "guest_id", nullable = false)
-    private Guest guest;
 
     // Room
     @ManyToOne
@@ -41,14 +36,13 @@ public class Booking {
     private LocalDate checkOutDate;
 
     private Double totalPrice;
-
-    @Enumerated(EnumType.STRING)
-    private BookingStatus status;
     private Long nights;
 
+    private String phone;
+    private String email;
+    private String specialRequest;
 
-    // Payment
-//    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
-//    private Payment payment;
 }
+
+
 
