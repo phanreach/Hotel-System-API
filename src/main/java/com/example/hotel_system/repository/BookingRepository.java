@@ -29,5 +29,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     );
     List<Booking> findByBooker(User booker);
 
-    List<Booking> findByGuestEmailAndBookerIsNull(String email);
+    List<Booking> findByGuest_EmailAndBookerIsNull(String email);
+
 }
