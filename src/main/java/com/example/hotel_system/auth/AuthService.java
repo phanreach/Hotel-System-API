@@ -38,7 +38,7 @@ public class AuthService {
         }
 
         User user = new User();
-        user.setEmail(request.getEmail());
+        user.setEmail(request.getEmail().trim().toLowerCase());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -119,7 +119,8 @@ public class AuthService {
     String email = user.getEmail().trim().toLowerCase();
 
         var bookings = bookingRepository
-                .findByGuestEmailAndBookerIsNull(email);
+                .findByGuest_EmailAndBookerIsNull
+                        (email);
 
         System.out.println("FOUND BOOKINGS = " + bookings.size());
 

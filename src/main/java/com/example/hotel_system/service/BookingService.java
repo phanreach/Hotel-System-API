@@ -80,6 +80,7 @@ public class BookingService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+
         if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
 
             String email = auth.getName();
@@ -109,7 +110,9 @@ public class BookingService {
         Guest guest = new Guest();
         guest.setFirstName(request.getGuest().getFirstName());
         guest.setLastName(request.getGuest().getLastName());
-        guest.setEmail(request.getGuest().getEmail());
+        guest.setEmail(
+                request.getGuest().getEmail().trim().toLowerCase()
+        );
         guest.setPhone(request.getGuest().getPhone());
 
         guestRepository.save(guest);
