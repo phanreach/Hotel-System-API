@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -63,6 +65,26 @@ public class BookingController {
             @Valid @RequestBody BookingRequestDTO request) {
         BookingResponseDTO bookingResponse = bookingService.createBooking(request);
         return ResponseEntity.ok(bookingResponse);
+    }
+
+    @PutMapping("/{id}/cancel")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> cancelBooking(@PathVariable Long id) {
+        bookingService.cancelBooking(id);
+        return ResponseEntity.ok("Booking cancelled");
+    }
+
+    @GetMapping("/availability")
+    public ResponseEntity<?> checkAvailability(
+            @RequestParam Long roomId,
+            @RequestParam LocalDate checkIn,
+            @RequestParam LocalDate checkOut
+    ) {
+        boolean available = bookingService.isRoomAvailable(roomId, checkIn, checkOut);
+
+        return ResponseEntity.ok(
+                Map.of("available", available)
+        );
     }
 
 }

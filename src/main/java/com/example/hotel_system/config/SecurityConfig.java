@@ -51,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/bookings").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/bookings").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/bookings/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/bookings").authenticated()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/rooms/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/rooms/**").hasRole("ADMIN")
@@ -86,7 +87,8 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "https://hotel-wing-project.mrrorng12345.workers.dev",
                 "https://hotel-admin.mockexamkh.com",
-                "https://hotel-management.reach4phan.workers.dev"
+                "https://hotel-management.reach4phan.workers.dev",
+                "https://hotel-system.reach4phan.workers.dev"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

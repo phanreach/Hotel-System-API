@@ -1,5 +1,6 @@
 package com.example.hotel_system.model;
 
+import com.example.hotel_system.enumeration.BookingStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -41,6 +42,10 @@ public class Booking {
     private String phone;
     private String email;
     private String specialRequest;
+
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
+
 
 }
 

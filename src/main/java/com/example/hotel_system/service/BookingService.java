@@ -11,10 +11,12 @@ import com.example.hotel_system.response.BookingResponseDTO;
 import com.example.hotel_system.response.RoomResponse;
 import com.example.hotel_system.user.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -55,13 +57,16 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Room not found"));
 
         // 4️⃣ Check availability
-        boolean isAvailable = !bookingRepository.existsByRoomAndCheckOutDateAfterAndCheckInDateBefore(
-                room,
-                request.getCheckInDate(),
-                request.getCheckOutDate()
-        );
+        boolean isAvailable = !bookingRepository
+                .existsByRoomAndStatusAndCheckOutDateAfterAndCheckInDateBefore(
+                        room,
+                        BookingStatus.CONFIRMED,
+                        request.getCheckInDate(),
+                        request.getCheckOutDate()
+                );
+
         if (!isAvailable) {
-            throw new RuntimeException("Room not available for selected dates");
+            throw new RuntimeException("Room already booked for selected dates");
         }
 
         // 5️⃣ Calculate price
@@ -78,6 +83,7 @@ public class BookingService {
         booking.setTotalPrice(totalPrice);
         booking.setPhone(request.getPhone());
         booking.setSpecialRequest(request.getSpecialRequest());
+        booking.setStatus(BookingStatus.CONFIRMED);
 
         bookingRepository.save(booking);
 
@@ -147,6 +153,41 @@ public class BookingService {
                 .map(this::mapToResponse)
                 .toList();
     }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void completePastBookings() {
+        bookingRepository.markCompleted(LocalDate.now());
+    }
+
+    public void cancelBooking(Long bookingId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (!booking.getBooker().getEmail().equals(email)) {
+            throw new RuntimeException("Not allowed to cancel this booking");
+        }
+
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+    }
+
+    public boolean isRoomAvailable(Long roomId, LocalDate checkIn, LocalDate checkOut) {
+
+        RoomModel room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("Room not found"));
+
+        return !bookingRepository
+                .existsByRoomAndStatusAndCheckOutDateAfterAndCheckInDateBefore(
+                        room,
+                        BookingStatus.CONFIRMED,
+                        checkIn,
+                        checkOut
+                );
+    }
+
 
 }
 
