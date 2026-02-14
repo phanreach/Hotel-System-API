@@ -64,11 +64,15 @@ public class RoomService {
     public RoomModel createRoom(RoomRequest request) {
 
         RoomModel room = new RoomModel();
+        List<Long> amenityIds = request.getAmenityIds();
+        if (amenityIds == null || amenityIds.isEmpty()) {
+            throw new IllegalArgumentException("Please select at least one amenity");
+        }
 
         Set<Amenities> amenities = request.getAmenityIds()
                 .stream()
                 .map(id -> amenityRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Amenity not found")))
+                        .orElseThrow(() -> new IllegalArgumentException("Amenity not found")))
                 .collect(Collectors.toSet());
 
         room.setTitle(request.getTitle());
